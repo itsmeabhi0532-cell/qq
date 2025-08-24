@@ -1,0 +1,995 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HBD love</title>	    
+    <link type="text/css" rel="stylesheet" href="./file/default.css">
+    <!-- Import Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&family=Great+Vibes&family=Parisienne&family=Caveat:wght@500&family=Quicksand:wght@500&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base styles */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        #main {
+            width: 1100px;
+            height: 680px;
+            position: relative;
+            transform-origin: center center;
+        }
+        
+        /* Additional styles for the surprise button and messages */
+        #surprise-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-family: 'Pacifico', cursive;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s ease;
+            z-index: 100;
+            display: none; /* Initially hidden */
+            opacity: 0;
+        }
+        
+        #surprise-btn.show {
+            display: block;
+            animation: fadeInPulse 1.5s ease forwards;
+        }
+        
+        @keyframes fadeInPulse {
+            0% { opacity: 0; transform: translateX(-50%) scale(0.8); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+            100% { opacity: 1; transform: translateX(-50%) scale(1); }
+        }
+        
+        #surprise-btn:hover {
+            background: linear-gradient(45deg, #ff5252, #ff7979);
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+        
+        #messages-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(25, 25, 112, 0.9), rgba(70, 130, 180, 0.9));
+            z-index: 200;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Main close button for messages container */
+        .main-close-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 36px;
+            color: white;
+            background: rgba(255, 107, 107, 0.8);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 201;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .main-close-btn:hover {
+            background: rgba(255, 107, 107, 1);
+            transform: scale(1.1);
+        }
+        
+        .message-card {
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px auto;
+            max-width: 650px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.5s ease;
+        }
+        
+        .message-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 107, 107, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            z-index: 0;
+        }
+        
+        .message-card.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .message-card h3 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 32px;
+            color: #ff6b6b;
+            margin: 0 0 0 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .handwritten-link {
+            font-family: 'Caveat', cursive;
+            font-size: 18px;
+            color: #4a6fa5;
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px dashed #4a6fa5;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            background-color: rgba(74, 111, 165, 0.1);
+        }
+        
+        .handwritten-link:hover {
+            background-color: rgba(74, 111, 165, 0.2);
+            color: #ff6b6b;
+            border-color: #ff6b6b;
+            transform: scale(1.05);
+        }
+        
+        .message-card p {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            color: #aaa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+        
+        .close-btn:hover {
+            color: #ff6b6b;
+            transform: rotate(90deg);
+        }
+        
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0,0,0,0.95), rgba(25, 25, 112, 0.9));
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(8px);
+        }
+        
+        .image-modal img {
+            max-width: 90%;
+            max-height: 80%;
+            border: 8px solid white;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            animation: imageAppear 0.5s ease;
+        }
+        
+        @keyframes imageAppear {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .image-modal .close-modal {
+            color: white;
+            font-size: 40px;
+            margin-top: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Great Vibes', cursive;
+        }
+        
+        .image-modal .close-modal:hover {
+            color: #ff6b6b;
+            transform: scale(1.2);
+        }
+        
+        .message-icon {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 24px;
+            color: rgba(255, 107, 107, 0.7);
+            z-index: 1;
+        }
+        
+        .message-decoration {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            font-size: 20px;
+            color: rgba(255, 107, 107, 0.5);
+            z-index: 1;
+        }
+        
+        /* Heart click area - visible on all devices */
+        .heart-click-area {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 107, 107, 0.2);
+            z-index: 50;
+            cursor: pointer;
+            display: block;
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 107, 107, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+        }
+        
+        .heart-click-area:hover {
+            transform: scale(1.1);
+            border-color: rgba(255, 107, 107, 0.7);
+            background: rgba(255, 107, 107, 0.3);
+        }
+        
+        .heart-click-area:active {
+            transform: scale(0.95);
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 1200px) {
+            #main {
+                transform: scale(0.85);
+            }
+            .heart-click-area {
+                width: 70px;
+                height: 70px;
+            }
+        }
+        
+        @media (max-width: 1000px) {
+            #main {
+                transform: scale(0.75);
+            }
+            .heart-click-area {
+                width: 80px;
+                height: 80px;
+            }
+        }
+        
+        @media (max-width: 850px) {
+            #main {
+                transform: scale(0.65);
+            }
+            .heart-click-area {
+                width: 90px;
+                height: 90px;
+            }
+            
+            .message-card {
+                max-width: 90%;
+                padding: 20px;
+            }
+            
+            .message-card h3 {
+                font-size: 28px;
+            }
+            
+            .message-card p {
+                font-size: 16px;
+            }
+            
+            .handwritten-link {
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 720px) {
+            #main {
+                transform: scale(0.55);
+            }
+            .heart-click-area {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .message-card {
+                padding: 15px;
+            }
+            
+            .message-card h3 {
+                font-size: 24px;
+            }
+            
+            .message-card p {
+                font-size: 14px;
+            }
+            
+            .handwritten-link {
+                font-size: 14px;
+                padding: 3px 8px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            #main {
+                transform: scale(0.45);
+            }
+            .heart-click-area {
+                width: 110px;
+                height: 110px;
+            }
+            
+            #text {
+                top: 30px;
+            }
+            
+            #code {
+                font-size: 14px;
+            }
+            
+            #clock-box {
+                bottom: 30px;
+            }
+            
+            #clock {
+                font-size: 16px;
+            }
+            
+            .main-close-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 28px;
+                top: 15px;
+                right: 15px;
+            }
+        }
+        
+        @media (max-width: 500px) {
+            #main {
+                transform: scale(0.4);
+            }
+            .heart-click-area {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .message-card {
+                padding: 12px;
+                margin: 15px auto;
+            }
+            
+            .message-card h3 {
+                font-size: 20px;
+            }
+            
+            .message-card p {
+                font-size: 12px;
+            }
+            
+            .handwritten-link {
+                font-size: 12px;
+                padding: 2px 6px;
+            }
+        }
+        
+        @media (max-width: 440px) {
+            #main {
+                transform: scale(0.35);
+            }
+            .heart-click-area {
+                width: 130px;
+                height: 130px;
+            }
+            
+            #text {
+                top: 20px;
+            }
+            
+            #code {
+                font-size: 12px;
+            }
+            
+            #clock-box {
+                bottom: 20px;
+            }
+            
+            #clock {
+                font-size: 14px;
+            }
+        }
+    </style>
+    <script type="text/javascript" src="./file/jquery.min.js"></script>
+    <script type="text/javascript" src="./file/jscex.min.js"></script>
+    <script type="text/javascript" src="./file/jscex-parser.js"></script>
+    <script type="text/javascript" src="./file/jscex-jit.js"></script>
+    <script type="text/javascript" src="./file/jscex-builderbase.min.js"></script>
+    <script type="text/javascript" src="./file/jscex-async.min.js"></script>
+    <script type="text/javascript" src="./file/jscex-async-powerpack.min.js"></script>
+    <script type="text/javascript" src="./file/functions.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./file/love.js" charset="utf-8"></script>
+    <script>
+        function playAudio() {
+            var audio = document.getElementById("myAudio");
+            audio.play();
+        }
+        
+        // Object to store friend image URLs (replace these with actual URLs later)
+        const friendImages = {
+            "Penguin": "https://example.com/penguin-image.jpg",
+            "Superman": "https://example.com/superman-image.jpg",
+            "Giyan": "https://example.com/giyan-image.jpg",
+            "Shea": "https://example.com/shea-image.jpg",
+            "Nancy": "nancy.jpg",
+            "Anshuman": "https://example.com/anshuman-image.jpg",
+            "Lakshay": "https://example.com/lakshay-image.jpg",
+            "Bhalu": "https://example.com/bhalu-image.jpg",
+            "Surya": "https://example.com/surya-image.jpg",
+            "Aditya": "https://example.com/aditya-image.jpg",
+            "Majnu": "https://example.com/majnu-image.jpg",
+            "Dhairya": "https://example.com/dhairya-image.jpg",
+            "Sky": "https://example.com/sky-image.jpg",
+            "Darlo": "https://example.com/darlo-image.jpg",
+            "Shaktiman": "https://example.com/shaktiman-image.jpg",
+            "Abg": "https://example.com/abg-image.jpg",
+            "Serial Wise": "https://example.com/serialwise-image.jpg"
+        };
+    </script>
+</head>
+<body>
+    <div id="main">
+        <div id="error"><a href="http://www.google.cn/chrome/intl/zh-CN/landing_chrome.html?hl=zh-CN&brand=CHMI">Chrome</a> (<a href="http://firefox.com.cn/download/">Firefox</a>)</div>
+        <audio autoplay="autoplay" height="100" width="100" id="myAudio">
+            <source src="aud.mp3" type="audio/mp3" />
+            <embed height="100" width="100" src="aud.mp3" />
+        </audio>
+        <div id="wrap">
+            <div id="text">
+                <div id="code">
+                    <span class="say">Wishing you a day filled with laughter, love, and endless happiness.</span><br>
+                    <span class="say">May this year bring you all the success, joy, and adventures you truly deserve.</span><br>
+                    <span class="say">You're not just a friend, you're family—and I'm so lucky to have you in my life.</span><br>
+                </div>
+            </div>
+            <div id="clock-box">
+                <span id="clock">577 days 0 hours 0 minutes 0 seconds</span> <!-- Change to "6940 days..." if needed -->
+            </div>
+            <canvas id="canvas" width="1100" height="680"></canvas>
+            <!-- Heart click area - visible on all devices -->
+            <div class="heart-click-area" id="heart-click-area"></div>
+        </div>
+        
+        <!-- Surprise Button (initially hidden) -->
+        <button id="surprise-btn">🎁 Special Surprises For You 🎁</button>
+        
+        <!-- Messages Container (initially hidden) -->
+        <div id="messages-container">
+            <!-- Main close button for the entire container -->
+            <div class="main-close-btn">&times;</div>
+            
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">🐧</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Penguin">Click here for hand written notes</a>
+                    <h3>Penguin</h3>
+                </div>
+                <p>Happy Birthday! May your special day be filled with joy, laughter, and all the things you love most. You deserve the world and more! 🎂🎉</p>
+                <span class="message-decoration">❄️</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">🦸</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Superman">Click here for hand written notes</a>
+                    <h3>Superman</h3>
+                </div>
+                <p>Wishing you a super birthday! May your day be as amazing as you are. Enjoy every moment of your special day! 🎈🎁</p>
+                <span class="message-decoration">🌟</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">🌟</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Giyan">Click here for hand written notes</a>
+                    <h3>Giyan</h3>
+                </div>
+                <p>Happy Birthday! May your day be filled with happiness, love, and all the blessings life has to offer. Enjoy your special day! 🌸🌺</p>
+                <span class="message-decoration">💖</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">🌿</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Shea">Click here for hand written notes</a>
+                    <h3>Shea</h3>
+                </div>
+                <p>Another year older, another year more fabulous! May your birthday be the start of a year filled with good luck, good health, and much happiness. 🎊🎂</p>
+                <span class="message-decoration">🎉</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">🌸</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Nancy">Click here for hand written notes</a>
+                    <h3>Nancy</h3>
+                </div>
+                <p>Happy Birthday to the most amazing person I know! May your day be as wonderful as you are. Sending you lots of love and hugs! 💐🎁</p>
+                <span class="message-decoration">🌹</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">🌞</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Anshuman">Click here for hand written notes</a>
+                    <h3>Anshuman</h3>
+                </div>
+                <p>Wishing you a birthday that's as bright and wonderful as you are! May all your dreams come true this year. Enjoy your day to the fullest! 🎈🎁</p>
+                <span class="message-decoration">✨</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">🏆</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Lakshay">Click here for hand written notes</a>
+                    <h3>Lakshay</h3>
+                </div>
+                <p>Happy Birthday! May your special day be filled with joy, laughter, and all the things you love most. You deserve the world and more! 🎂🎉</p>
+                <span class="message-decoration">🌟</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">🐻</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Bhalu">Click here for hand written notes</a>
+                    <h3>Bhalu</h3>
+                </div>
+                <p>Wishing you a day that's as sweet and wonderful as you are! May all your birthday wishes come true. Enjoy your special day! 🍯🎂</p>
+                <span class="message-decoration">🍃</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">☀️</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Surya">Click here for hand written notes</a>
+                    <h3>Surya</h3>
+                </div>
+                <p>Happy Birthday! May your day shine as bright as the sun and be filled with warmth, happiness, and love. Enjoy your special day! ☀️🎂</p>
+                <span class="message-decoration">🌞</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">🌅</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Aditya">Click here for hand written notes</a>
+                    <h3>Aditya</h3>
+                </div>
+                <p>Wishing you a birthday that's as radiant and wonderful as the rising sun! May your day be filled with joy, laughter, and all your favorite things. 🌅🎁</p>
+                <span class="message-decoration">✨</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">💕</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Majnu">Click here for hand written notes</a>
+                    <h3>Majnu</h3>
+                </div>
+                <p>Happy Birthday to the most passionate and loving person I know! May your day be filled with romance, joy, and all the things that make your heart sing. 💕🎂</p>
+                <span class="message-decoration">🌹</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">🧘</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Dhairya">Click here for hand written notes</a>
+                    <h3>Dhairya</h3>
+                </div>
+                <p>Wishing you a birthday filled with peace, patience, and all the calmness you bring to others. May your day be as serene and beautiful as you are. 🧘‍♀️🎂</p>
+                <span class="message-decoration">🕊️</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">☁️</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Sky">Click here for hand written notes</a>
+                    <h3>Sky</h3>
+                </div>
+                <p>Happy Birthday! May your day be as limitless and beautiful as the sky. May all your dreams soar high and come true this year. ☁️🎂</p>
+                <span class="message-decoration">🌈</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">🎩</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Darlo">Click here for hand written notes</a>
+                    <h3>Darlo</h3>
+                </div>
+                <p>Wishing you a birthday that's as classy and wonderful as you are! May your day be filled with elegance, joy, and all your favorite things. 🎩🎂</p>
+                <span class="message-decoration">✨</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">💪</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Shaktiman">Click here for hand written notes</a>
+                    <h3>Shaktiman</h3>
+                </div>
+                <p>Happy Birthday to the strongest person I know! May your day be filled with power, energy, and all the strength you bring to others. 💪🎂</p>
+                <span class="message-decoration">⚡</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">🤗</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Abg">Click here for hand written notes</a>
+                    <h3>Abg</h3>
+                </div>
+                <p>Wishing you the happiest of birthdays! May your day be filled with love, laughter, and all the warmth you bring to everyone around you. 🤗🎂</p>
+                <span class="message-decoration">💖</span>
+            </div>
+            <div class="message-card">
+                <span class="close-btn">&times;</span>
+                <span class="message-icon">📺</span>
+                <div class="message-header">
+                    <a href="#" class="handwritten-link" data-friend="Serial Wise">Click here for hand written notes</a>
+                    <h3>Serial Wise</h3>
+                </div>
+                <p>Happy Birthday! May your day be as entertaining and wonderful as your favorite shows. May all your stories have happy endings this year! 📺🎂</p>
+                <span class="message-decoration">🎬</span>
+            </div>
+        </div>
+        
+        <!-- Image Modal (initially hidden) -->
+        <div class="image-modal">
+            <img src="" alt="Friend's image" id="modal-image">
+            <div class="close-modal">Close</div>
+        </div>
+    </div>
+    
+    <script>
+    (function() {
+        var canvas = $('#canvas');
+        
+        if (!canvas[0].getContext) {
+            $("#error").show();
+            return false;
+        }
+        var width = canvas.width();
+        var height = canvas.height();        
+        canvas.attr("width", width);
+        canvas.attr("height", height);
+        var opts = {
+            seed: {
+                x: width / 2 - 20,
+                color: "rgb(190, 26, 37)",
+                scale: 2
+            },
+            branch: [
+                [535, 680, 570, 250, 500, 200, 30, 100, [
+                    [540, 500, 455, 417, 340, 400, 13, 100, [
+                        [450, 435, 434, 430, 394, 395, 2, 40]
+                    ]],
+                    [550, 445, 600, 356, 680, 345, 12, 100, [
+                        [578, 400, 648, 409, 661, 426, 3, 80]
+                    ]],
+                    [539, 281, 537, 248, 534, 217, 3, 40],
+                    [546, 397, 413, 247, 328, 244, 9, 80, [
+                        [427, 286, 383, 253, 371, 205, 2, 40],
+                        [498, 345, 435, 315, 395, 330, 4, 60]
+                    ]],
+                    [546, 357, 608, 252, 678, 221, 6, 100, [
+                        [590, 293, 646, 277, 648, 271, 2, 80]
+                    ]]
+                ]] 
+            ],
+            bloom: {
+                num: 700,
+                width: 1080,
+                height: 650,
+            },
+            footer: {
+                width: 1200,
+                height: 5,
+                speed: 10,
+            }
+        }
+        var tree = new Tree(canvas[0], width, height, opts);
+        var seed = tree.seed;
+        var foot = tree.footer;
+        var hold = 1;
+        
+        // Position the heart click area
+        function positionHeartClickArea() {
+            var $heartArea = $('#heart-click-area');
+            var canvas = $('#canvas')[0];
+            var mainContainer = $('#main')[0];
+            var wrapContainer = $('#wrap')[0];
+            
+            // Get the actual rendered dimensions of the canvas
+            var canvasRect = canvas.getBoundingClientRect();
+            var mainRect = mainContainer.getBoundingClientRect();
+            var wrapRect = wrapContainer.getBoundingClientRect();
+            
+            // Calculate the scale factor between the canvas's internal dimensions and its rendered size
+            var scaleX = canvasRect.width / canvas.width;
+            var scaleY = canvasRect.height / canvas.height;
+            
+            // Get the heart's position in the canvas's internal coordinate system
+            var heartX = opts.seed.x;
+            var heartY = opts.seed.y;
+            
+            // Calculate the heart's position in the rendered canvas
+            var renderedHeartX = heartX * scaleX;
+            var renderedHeartY = heartY * scaleY;
+            
+            // Calculate the position relative to the main container
+            var heartSize = $heartArea.width();
+            var left = (canvasRect.left - mainRect.left) + renderedHeartX - (heartSize / 2);
+            var top = (canvasRect.top - mainRect.top) + renderedHeartY - (heartSize / 2);
+            
+            // Apply the calculated position
+            $heartArea.css({
+                left: left + 'px',
+                top: top + 'px'
+            });
+        }
+        
+        // Initialize heart click area position
+        setTimeout(positionHeartClickArea, 100);
+        
+        // Update position on window resize
+        $(window).on('resize', function() {
+            positionHeartClickArea();
+        });
+        
+        // Handle heart click area click with both click and touch events
+        $('#heart-click-area').on('click touchstart', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (hold) {
+                // Visual feedback
+                $(this).addClass('clicked');
+                setTimeout(() => {
+                    $(this).removeClass('clicked');
+                }, 300);
+                
+                // Play audio and start animation
+                playAudio();
+                hold = 0; 
+                canvas.off("click");
+                canvas.off("mousemove");
+                canvas.removeClass('hand');
+                $(this).hide(); // Hide after click
+                
+                console.log("Heart clicked - animation started!");
+            }
+        });
+        
+        // Handle canvas click for desktop (fallback)
+        canvas.on('click', function(e) {
+            if (hold) {
+                playAudio();
+                var offset = canvas.offset(), x, y;
+                x = e.pageX - offset.left;
+                y = e.pageY - offset.top;
+                
+                if (seed.hover(x, y)) {
+                    hold = 0; 
+                    canvas.off("click");
+                    canvas.off("mousemove");
+                    canvas.removeClass('hand');
+                    $('#heart-click-area').hide(); // Hide after click
+                    console.log("Canvas heart clicked - animation started!");
+                }
+            }
+        }).on('mousemove', function(e) {
+            if (hold) {
+                var offset = canvas.offset(), x, y;
+                x = e.pageX - offset.left;
+                y = e.pageY - offset.top;
+                canvas.toggleClass('hand', seed.hover(x, y));
+            }
+        });
+        
+        var seedAnimate = eval(Jscex.compile("async", function () {
+            seed.draw();
+            while (hold) {
+                $await(Jscex.Async.sleep(10));
+                // Update heart click area position
+                positionHeartClickArea();
+            }
+            while (seed.canScale()) {
+                seed.scale(0.95);
+                $await(Jscex.Async.sleep(10));
+            }
+            while (seed.canMove()) {
+                seed.move(0, 2);
+                foot.draw();
+                $await(Jscex.Async.sleep(10));
+            }
+        }));
+        var growAnimate = eval(Jscex.compile("async", function () {
+            do {
+                tree.grow();
+                $await(Jscex.Async.sleep(10));
+            } while (tree.canGrow());
+        }));
+        var flowAnimate = eval(Jscex.compile("async", function () {
+            do {
+                tree.flower(2);
+                $await(Jscex.Async.sleep(10));
+            } while (tree.canFlower());
+        }));
+        var moveAnimate = eval(Jscex.compile("async", function () {
+            tree.snapshot("p1", 240, 0, 610, 680);
+            while (tree.move("p1", 500, 0)) {
+                foot.draw();
+                $await(Jscex.Async.sleep(10));
+            }
+            foot.draw();
+            tree.snapshot("p2", 500, 0, 610, 680);
+            canvas.parent().css("background", "url(" + tree.toDataURL('image/png') + ")");
+            canvas.css("background", "#ffe");
+            $await(Jscex.Async.sleep(300));
+            canvas.css("background", "none");
+        }));
+        var textAnimate = eval(Jscex.compile("async", function () {
+            $("#code").show().typewriter();
+            // Wait for typewriter effect to complete (approximately 12 seconds)
+            $await(Jscex.Async.sleep(12000));
+        }));
+        
+        var runAsync = eval(Jscex.compile("async", function () {
+            try {
+                $await(seedAnimate());
+                $await(growAnimate());
+                $await(flowAnimate());
+                $await(moveAnimate());
+                $await(textAnimate());
+                // Show surprise button after all animations complete
+                setTimeout(function() {
+                    $("#surprise-btn").addClass("show");
+                }, 1000);
+            } catch (e) {
+                console.error("Animation error:", e);
+                // Show button even if animations fail
+                $("#surprise-btn").addClass("show");
+            }
+        }));
+        
+        // Start the animation sequence
+        runAsync().start();
+        
+        // Fallback: Show button after 15 seconds in case animations don't trigger properly
+        setTimeout(function() {
+            if (!$("#surprise-btn").hasClass("show")) {
+                $("#surprise-btn").addClass("show");
+            }
+        }, 15000);
+    })();
+    
+    // New functionality for the surprise button and messages
+    $(document).ready(function() {
+        // Show messages when surprise button is clicked
+        $("#surprise-btn").click(function() {
+            $("#messages-container").fadeIn();
+            // Play audio when messages are opened
+            playAudio();
+            
+            // Animate message cards to appear one by one
+            $('.message-card').each(function(index) {
+                var card = $(this);
+                setTimeout(function() {
+                    card.addClass("show");
+                }, 200 * index); // Stagger the animations
+            });
+        });
+        
+        // Close individual message cards
+        $(".close-btn").click(function(e) {
+            e.stopPropagation(); // Prevent event from bubbling up
+            $(this).parent().removeClass("show");
+            setTimeout(function() {
+                $(this).parent().hide();
+            }.bind(this), 500);
+        });
+        
+        // Close messages container when main close button is clicked
+        $(".main-close-btn").click(function() {
+            $("#messages-container").fadeOut();
+            $('.message-card').removeClass("show");
+        });
+        
+        // Close messages container when clicking outside (but not on cards)
+        $("#messages-container").click(function(e) {
+            if (e.target.id === "messages-container") {
+                $(this).fadeOut();
+                $('.message-card').removeClass("show");
+            }
+        });
+        
+        // Open friend image when handwritten notes link is clicked
+        $(".handwritten-link").click(function(e) {
+            e.preventDefault(); // Prevent default link behavior
+            e.stopPropagation(); // Prevent event from bubbling up
+            const friendName = $(this).data("friend");
+            const imageUrl = friendImages[friendName];
+            
+            if (imageUrl) {
+                $("#modal-image").attr("src", imageUrl);
+                $(".image-modal").fadeIn();
+                playAudio(); // Play audio when image is opened
+            }
+        });
+        
+        // Close image modal
+        $(".close-modal").click(function() {
+            $(".image-modal").fadeOut();
+        });
+        
+        // Close image modal when clicking outside the image
+        $(".image-modal").click(function(e) {
+            if (e.target === this) {
+                $(this).fadeOut();
+            }
+        });
+    });
+    </script>
+</body>
+</html>
